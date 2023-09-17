@@ -33,26 +33,23 @@ class LinkedList:
     def __len__(self):
         return self._size
 
-    def __getitem__(self, key):
-        _key = key
-        if key < 0:
-            _key = self._size + key
-        if _key < 0 or _key >= self._size:
-            raise IndexError()
+    def __get_node__(self, index: int):
+        _index = index
+        if index < 0:
+            _index = self._size + index
+        if _index < 0 or _index >= self._size:
+            raise IndexError("list index out of range")
         node = self._initial
-        for _ in range(_key):
+        for _ in range(_index):
             node = node.next
+        return node
+
+    def __getitem__(self, key):
+        node = self.__get_node__(key)
         return node.value
 
     def __setitem__(self, key, value):
-        _key = key
-        if key < 0:
-            _key = self._size + key
-        if _key < 0 or _key >= self._size:
-            raise IndexError()
-        node = self._initial
-        for _ in range(_key):
-            node = node.next
+        node = self.__get_node__(key)
         node.value = value
 
 
