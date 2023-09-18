@@ -1,4 +1,4 @@
-from typing import Any, TypeVar
+from typing import TypeVar
 
 TNode = TypeVar("TNode", bound="Node")
 
@@ -6,7 +6,7 @@ TNode = TypeVar("TNode", bound="Node")
 class Node:
     next: TNode | None
 
-    def __init__(self, value: Any):
+    def __init__(self, value: int):
         self.value = value
         self.next = None
 
@@ -19,7 +19,7 @@ class LinkedList:
         self._initial = None
         self._size = 0
 
-    def add(self, value: Any):
+    def add(self, value: int):
         new_node = Node(value)
         if self._size == 0:
             self._initial = new_node
@@ -46,17 +46,17 @@ class LinkedList:
             node = node.next
         return node
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: int):
         if self._size == 0:
             raise IndexError()
         node = self._get_node(key)
         return node.value
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: int, value: int):
         node = self._get_node(key)
         node.value = value
 
-    def index(self, value):
+    def index(self, value: int):
         index = 0
         node = self._initial
         while node is not None:
@@ -66,7 +66,7 @@ class LinkedList:
             index += 1
         return -1
 
-    def insert(self, index, value):
+    def insert(self, index: int, value: int):
         new_node = Node(value)
         if index == 0:
             new_node.next = self._initial
@@ -76,6 +76,24 @@ class LinkedList:
             new_node.next = previous_node.next
             previous_node.next = new_node
         self._size += 1
+
+    def remove(self, value: int):
+        if self._size == 0:
+            return ValueError()
+        if self._initial.value == value:
+            self._initial = self._initial.next
+            self._size -= 1
+        else:
+            previous_node = self._initial
+            current_node = previous_node.next
+            while current_node is not None:
+                if current_node.value == value:
+                    previous_node.next = current_node.next
+                    current_node.next = None
+                    self._size -= 1
+                    break
+                previous_node = current_node
+                current_node = current_node.next
 
 
 if __name__ == "__main__":
@@ -160,15 +178,43 @@ if __name__ == "__main__":
     linkedlist.insert(0, 150)
     assert linkedlist[0] == 150
     assert linkedlist[1] == aux
+    assert len(linkedlist) == 4
 
     # check insert in the middle
     aux = linkedlist[2]
     linkedlist.insert(2, 232)
     assert linkedlist[2] == 232
     assert linkedlist[3] == aux
+    assert len(linkedlist) == 5
 
     # check insert after last
     aux = linkedlist[len(linkedlist) - 1]
     linkedlist.insert(len(linkedlist), 345)
     assert linkedlist[len(linkedlist) - 1] == 345
     assert linkedlist[len(linkedlist) - 2] == aux
+    assert len(linkedlist) == 6
+
+    linkedlist = LinkedList()
+    linkedlist.add(10)
+    linkedlist.add(20)
+    linkedlist.add(30)
+    linkedlist.add(40)
+    linkedlist.add(50)
+
+    # remove the first item
+    aux = linkedlist[1]
+    linkedlist.remove(10)
+    assert linkedlist[0] == aux
+    assert len(linkedlist) == 4
+
+    # remove the middle item
+    aux = linkedlist[2]
+    linkedlist.remove(30)
+    assert linkedlist[1] == aux
+    assert len(linkedlist) == 3
+
+    # remove the last item
+    aux = linkedlist[len(linkedlist) - 2]
+    linkedlist.remove(50)
+    assert linkedlist[len(linkedlist) - 1] == aux
+    assert len(linkedlist) == 2
