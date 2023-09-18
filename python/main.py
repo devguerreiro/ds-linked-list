@@ -52,6 +52,16 @@ class LinkedList:
         node = self.__get_node__(key)
         node.value = value
 
+    def index(self, value):
+        index = 0
+        node = self._initial
+        while node is not None:
+            if node.value == value:
+                return index
+            node = node.next
+            index += 1
+        return -1
+
 
 if __name__ == "__main__":
     linkedlist = LinkedList()
@@ -74,6 +84,13 @@ if __name__ == "__main__":
     assert linkedlist[-1] == 2
     assert linkedlist[-2] == 1
     assert linkedlist[-3] == 0
+
+    assert linkedlist.index(0) == 0
+    assert linkedlist.index(1) == 1
+    assert linkedlist.index(2) == 2
+
+    assert linkedlist.index(3) == -1
+    assert linkedlist.index(-1) == -1
 
     try:
         linkedlist[3]
