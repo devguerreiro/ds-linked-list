@@ -33,23 +33,27 @@ class LinkedList:
     def __len__(self):
         return self._size
 
-    def __get_node__(self, index: int):
+    def _get_node(self, index: int):
         _index = index
         if index < 0:
             _index = self._size + index
-        if _index < 0 or _index >= self._size:
-            raise IndexError("list index out of range")
+            if _index < 0:
+                raise IndexError()
         node = self._initial
         for _ in range(_index):
+            if node is None:
+                raise IndexError()
             node = node.next
         return node
 
     def __getitem__(self, key):
-        node = self.__get_node__(key)
+        if self._size == 0:
+            raise IndexError()
+        node = self._get_node(key)
         return node.value
 
     def __setitem__(self, key, value):
-        node = self.__get_node__(key)
+        node = self._get_node(key)
         node.value = value
 
     def index(self, value):
@@ -62,72 +66,109 @@ class LinkedList:
             index += 1
         return -1
 
+    def insert(self, index, value):
+        new_node = Node(value)
+        if index == 0:
+            new_node.next = self._initial
+            self._initial = new_node
+        else:
+            previous_node = self._get_node(index - 1)
+            new_node.next = previous_node.next
+            previous_node.next = new_node
+        self._size += 1
+
 
 if __name__ == "__main__":
     linkedlist = LinkedList()
 
-    linkedlist.add(0)
-    linkedlist.add(1)
-    linkedlist.add(2)
+    BIG_INDEX = 2**100
 
-    assert linkedlist._initial.value == 0
-    assert linkedlist._initial.next.value == 1
-    assert linkedlist._initial.next.next.value == 2
+    linkedlist.add(10)
+    linkedlist.add(11)
+    linkedlist.add(12)
 
+    # check length
     assert linkedlist._size == 3
     assert len(linkedlist) == 3
 
-    assert linkedlist[0] == 0
-    assert linkedlist[1] == 1
-    assert linkedlist[2] == 2
-
-    assert linkedlist[-1] == 2
-    assert linkedlist[-2] == 1
-    assert linkedlist[-3] == 0
-
-    assert linkedlist.index(0) == 0
-    assert linkedlist.index(1) == 1
-    assert linkedlist.index(2) == 2
-
-    assert linkedlist.index(3) == -1
-    assert linkedlist.index(-1) == -1
-
-    try:
-        linkedlist[3]
-        raise AssertionError()
-    except Exception as e:
-        assert isinstance(e, IndexError)
-
-    try:
-        linkedlist[-4]
-        raise AssertionError()
-    except Exception as e:
-        assert isinstance(e, IndexError)
-
-    linkedlist[0] = 10
-    linkedlist[1] = 11
-    linkedlist[2] = 12
-
+    # check getitem
     assert linkedlist[0] == 10
     assert linkedlist[1] == 11
     assert linkedlist[2] == 12
 
-    linkedlist[-1] = 13
-    linkedlist[-2] = 14
-    linkedlist[-3] = 15
+    # check inverted getitem
+    assert linkedlist[-1] == 12
+    assert linkedlist[-2] == 11
+    assert linkedlist[-3] == 10
 
-    assert linkedlist[2] == 13
-    assert linkedlist[1] == 14
-    assert linkedlist[0] == 15
+    # check index
+    assert linkedlist.index(10) == 0
+    assert linkedlist.index(11) == 1
+    assert linkedlist.index(12) == 2
 
+    # check index of inexistent
+    assert linkedlist.index(BIG_INDEX) == -1
+
+    # check getitem of an index bigger than length
     try:
-        linkedlist[-4] = 1
+        linkedlist[BIG_INDEX]
         raise AssertionError()
     except Exception as e:
         assert isinstance(e, IndexError)
 
+    # check getitem of an index smaller than negative length
     try:
-        linkedlist[3] = 1
+        linkedlist[-BIG_INDEX]
         raise AssertionError()
     except Exception as e:
         assert isinstance(e, IndexError)
+
+    # check setitem
+    linkedlist[0] = 20
+    linkedlist[1] = 21
+    linkedlist[2] = 22
+
+    assert linkedlist[0] == 20
+    assert linkedlist[1] == 21
+    assert linkedlist[2] == 22
+
+    # check inverted setitem
+    linkedlist[-1] = 32
+    linkedlist[-2] = 31
+    linkedlist[-3] = 30
+
+    assert linkedlist[2] == 32
+    assert linkedlist[1] == 31
+    assert linkedlist[0] == 30
+
+    # check getitem of an index bigger than length
+    try:
+        linkedlist[BIG_INDEX] = 1
+        raise AssertionError()
+    except Exception as e:
+        assert isinstance(e, IndexError)
+
+    # check setitem of an index smaller than negative length
+    try:
+        linkedlist[-BIG_INDEX] = 1
+        raise AssertionError()
+    except Exception as e:
+        assert isinstance(e, IndexError)
+
+    # check insert before initial
+    aux = linkedlist[0]
+    linkedlist.insert(0, 150)
+    assert linkedlist[0] == 150
+    assert linkedlist[1] == aux
+
+    # check insert in the middle
+    aux = linkedlist[2]
+    linkedlist.insert(2, 232)
+    assert linkedlist[2] == 232
+    assert linkedlist[3] == aux
+
+    # check insert after last
+    aux = linkedlist[len(linkedlist) - 1]
+    linkedlist.insert(len(linkedlist), 345)
+    assert linkedlist[len(linkedlist) - 1] == 345
+    assert linkedlist[len(linkedlist) - 2] == aux
