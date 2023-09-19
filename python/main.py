@@ -159,7 +159,7 @@ if __name__ == "__main__":
     assert linkedlist[1] == 31
     assert linkedlist[0] == 30
 
-    # check getitem of an index bigger than length
+    # check setitem of an index bigger than length
     try:
         linkedlist[BIG_INDEX] = 1
         raise AssertionError()
@@ -195,6 +195,7 @@ if __name__ == "__main__":
     assert len(linkedlist) == 6
 
     linkedlist = LinkedList()
+
     linkedlist.add(10)
     linkedlist.add(20)
     linkedlist.add(30)
