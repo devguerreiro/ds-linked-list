@@ -4,34 +4,16 @@ TNode = TypeVar("TNode", bound="Node")
 
 
 class Node:
-    next: TNode | None
+    value: int
+    next: TNode | None = None
 
     def __init__(self, value: int):
         self.value = value
-        self.next = None
 
 
 class LinkedList:
-    _initial: Node | None
-    _size: int
-
-    def __init__(self):
-        self._initial = None
-        self._size = 0
-
-    def add(self, value: int):
-        new_node = Node(value)
-        if self._size == 0:
-            self._initial = new_node
-        else:
-            last_node: Node = self._initial
-            while last_node.next is not None:
-                last_node = last_node.next
-            last_node.next = new_node
-        self._size += 1
-
-    def __len__(self):
-        return self._size
+    _initial: Node | None = None
+    _size: int = 0
 
     def _get_node(self, index: int):
         _index = index
@@ -46,15 +28,16 @@ class LinkedList:
             node = node.next
         return node
 
-    def __getitem__(self, key: int):
+    def add(self, value: int):
+        new_node = Node(value)
         if self._size == 0:
-            raise IndexError()
-        node = self._get_node(key)
-        return node.value
-
-    def __setitem__(self, key: int, value: int):
-        node = self._get_node(key)
-        node.value = value
+            self._initial = new_node
+        else:
+            last_node: Node = self._initial
+            while last_node.next is not None:
+                last_node = last_node.next
+            last_node.next = new_node
+        self._size += 1
 
     def index(self, value: int):
         index = 0
@@ -83,6 +66,7 @@ class LinkedList:
         if self._initial.value == value:
             self._initial = self._initial.next
             self._size -= 1
+            return True
         else:
             previous_node = self._initial
             current_node = previous_node.next
@@ -91,131 +75,148 @@ class LinkedList:
                     previous_node.next = current_node.next
                     current_node.next = None
                     self._size -= 1
-                    break
+                    return True
                 previous_node = current_node
                 current_node = current_node.next
+            return False
+
+    def __len__(self):
+        return self._size
+
+    def __getitem__(self, key: int):
+        if self._size == 0:
+            raise IndexError()
+        node = self._get_node(key)
+        return node.value
+
+    def __setitem__(self, key: int, value: int):
+        node = self._get_node(key)
+        node.value = value
 
 
 if __name__ == "__main__":
-    linkedlist = LinkedList()
+    linked_list = LinkedList()
 
     BIG_INDEX = 2**100
 
-    linkedlist.add(10)
-    linkedlist.add(11)
-    linkedlist.add(12)
+    linked_list.add(10)
+    linked_list.add(11)
+    linked_list.add(12)
 
     # check length
-    assert linkedlist._size == 3
-    assert len(linkedlist) == 3
+    assert linked_list._size == 3
+    assert len(linked_list) == 3
 
     # check getitem
-    assert linkedlist[0] == 10
-    assert linkedlist[1] == 11
-    assert linkedlist[2] == 12
+    assert linked_list[0] == 10
+    assert linked_list[1] == 11
+    assert linked_list[2] == 12
 
     # check inverted getitem
-    assert linkedlist[-1] == 12
-    assert linkedlist[-2] == 11
-    assert linkedlist[-3] == 10
+    assert linked_list[-1] == 12
+    assert linked_list[-2] == 11
+    assert linked_list[-3] == 10
 
     # check index
-    assert linkedlist.index(10) == 0
-    assert linkedlist.index(11) == 1
-    assert linkedlist.index(12) == 2
+    assert linked_list.index(10) == 0
+    assert linked_list.index(11) == 1
+    assert linked_list.index(12) == 2
 
     # check index of inexistent
-    assert linkedlist.index(BIG_INDEX) == -1
+    assert linked_list.index(BIG_INDEX) == -1
 
     # check getitem of an index bigger than length
     try:
-        linkedlist[BIG_INDEX]
+        linked_list[BIG_INDEX]
         raise AssertionError()
     except Exception as e:
         assert isinstance(e, IndexError)
 
     # check getitem of an index smaller than negative length
     try:
-        linkedlist[-BIG_INDEX]
+        linked_list[-BIG_INDEX]
         raise AssertionError()
     except Exception as e:
         assert isinstance(e, IndexError)
 
     # check setitem
-    linkedlist[0] = 20
-    linkedlist[1] = 21
-    linkedlist[2] = 22
+    linked_list[0] = 20
+    linked_list[1] = 21
+    linked_list[2] = 22
 
-    assert linkedlist[0] == 20
-    assert linkedlist[1] == 21
-    assert linkedlist[2] == 22
+    assert linked_list[0] == 20
+    assert linked_list[1] == 21
+    assert linked_list[2] == 22
 
     # check inverted setitem
-    linkedlist[-1] = 32
-    linkedlist[-2] = 31
-    linkedlist[-3] = 30
+    linked_list[-1] = 32
+    linked_list[-2] = 31
+    linked_list[-3] = 30
 
-    assert linkedlist[2] == 32
-    assert linkedlist[1] == 31
-    assert linkedlist[0] == 30
+    assert linked_list[2] == 32
+    assert linked_list[1] == 31
+    assert linked_list[0] == 30
 
     # check setitem of an index bigger than length
     try:
-        linkedlist[BIG_INDEX] = 1
+        linked_list[BIG_INDEX] = 1
         raise AssertionError()
     except Exception as e:
         assert isinstance(e, IndexError)
 
     # check setitem of an index smaller than negative length
     try:
-        linkedlist[-BIG_INDEX] = 1
+        linked_list[-BIG_INDEX] = 1
         raise AssertionError()
     except Exception as e:
         assert isinstance(e, IndexError)
 
     # check insert before initial
-    aux = linkedlist[0]
-    linkedlist.insert(0, 150)
-    assert linkedlist[0] == 150
-    assert linkedlist[1] == aux
-    assert len(linkedlist) == 4
+    aux = linked_list[0]
+    linked_list.insert(0, 150)
+    assert linked_list[0] == 150
+    assert linked_list[1] == aux
+    assert len(linked_list) == 4
 
     # check insert in the middle
-    aux = linkedlist[2]
-    linkedlist.insert(2, 232)
-    assert linkedlist[2] == 232
-    assert linkedlist[3] == aux
-    assert len(linkedlist) == 5
+    aux = linked_list[2]
+    linked_list.insert(2, 232)
+    assert linked_list[2] == 232
+    assert linked_list[3] == aux
+    assert len(linked_list) == 5
 
     # check insert after last
-    aux = linkedlist[len(linkedlist) - 1]
-    linkedlist.insert(len(linkedlist), 345)
-    assert linkedlist[len(linkedlist) - 1] == 345
-    assert linkedlist[len(linkedlist) - 2] == aux
-    assert len(linkedlist) == 6
+    aux = linked_list[len(linked_list) - 1]
+    linked_list.insert(len(linked_list), 345)
+    assert linked_list[len(linked_list) - 1] == 345
+    assert linked_list[len(linked_list) - 2] == aux
+    assert len(linked_list) == 6
 
-    linkedlist = LinkedList()
+    linked_list = LinkedList()
 
-    linkedlist.add(10)
-    linkedlist.add(20)
-    linkedlist.add(30)
-    linkedlist.add(40)
-    linkedlist.add(50)
+    linked_list.add(10)
+    linked_list.add(20)
+    linked_list.add(30)
+    linked_list.add(40)
+    linked_list.add(50)
 
     # remove the first item
-    aux = linkedlist[1]
-    linkedlist.remove(10)
-    assert linkedlist[0] == aux
-    assert len(linkedlist) == 4
+    aux = linked_list[1]
+    assert linked_list.remove(10)
+    assert linked_list[0] == aux
+    assert len(linked_list) == 4
 
     # remove the middle item
-    aux = linkedlist[2]
-    linkedlist.remove(30)
-    assert linkedlist[1] == aux
-    assert len(linkedlist) == 3
+    aux = linked_list[2]
+    assert linked_list.remove(30)
+    assert linked_list[1] == aux
+    assert len(linked_list) == 3
 
     # remove the last item
-    aux = linkedlist[len(linkedlist) - 2]
-    linkedlist.remove(50)
-    assert linkedlist[len(linkedlist) - 1] == aux
-    assert len(linkedlist) == 2
+    aux = linked_list[len(linked_list) - 2]
+    assert linked_list.remove(50)
+    assert linked_list[len(linked_list) - 1] == aux
+    assert len(linked_list) == 2
+
+    # remove inexistent item
+    assert not linked_list.remove(30)
