@@ -14,24 +14,6 @@ namespace NSLinkedList {
         private initial: Node | null = null;
         private size: number = 0;
 
-        add(value: number): void {
-            const newNode = new Node(value);
-            if (this.size === 0) {
-                this.initial = newNode;
-            } else {
-                let lastNode = this.initial as Node;
-                while (lastNode.next !== null) {
-                    lastNode = lastNode.next;
-                }
-                lastNode.next = newNode;
-            }
-            this.size++;
-        }
-
-        get length(): number {
-            return this.size;
-        }
-
         private getNode(index: number) {
             const _index = index < 0 ? this.size + index : index;
             let node = this.initial;
@@ -46,6 +28,20 @@ namespace NSLinkedList {
                 return node;
             }
             throw new RangeError();
+        }
+
+        add(value: number): void {
+            const newNode = new Node(value);
+            if (this.size === 0) {
+                this.initial = newNode;
+            } else {
+                let lastNode = this.initial as Node;
+                while (lastNode.next !== null) {
+                    lastNode = lastNode.next;
+                }
+                lastNode.next = newNode;
+            }
+            this.size++;
         }
 
         get(index: number) {
@@ -93,21 +89,28 @@ namespace NSLinkedList {
                     let aux = this.initial.next;
                     this.initial.next = null;
                     this.initial = aux;
+                    this.size--;
+                    return true;
                 } else {
                     let previousNode = this.initial;
-                    let currentNode = previousNode.next as Node;
-                    while (currentNode !== null && currentNode.next !== null) {
+                    let currentNode = previousNode.next;
+                    while (currentNode !== null) {
                         if (currentNode.value === value) {
-                            break;
+                            previousNode.next = currentNode.next;
+                            currentNode.next = null;
+                            this.size--;
+                            return true;
                         }
                         previousNode = currentNode;
                         currentNode = currentNode.next;
                     }
-                    previousNode.next = currentNode.next;
-                    currentNode.next = null;
+                    return false;
                 }
-                this.size--;
             }
+        }
+
+        get length(): number {
+            return this.size;
         }
     }
 }
@@ -204,18 +207,21 @@ linkedList2.add(50);
 
 // remove the first item
 aux = linkedList2.get(1);
-linkedList2.remove(10);
+assert.equal(linkedList2.remove(10), true);
 assert.equal(linkedList2.get(0), aux);
 assert.equal(linkedList2.length, 4);
 
 // remove the middle item
 aux = linkedList2.get(2);
-linkedList2.remove(30);
+assert.equal(linkedList2.remove(30), true);
 assert.equal(linkedList2.get(1), aux);
 assert.equal(linkedList2.length, 3);
 
 // remove the last item
 aux = linkedList2.get(linkedList2.length - 2);
-linkedList2.remove(50);
+assert.equal(linkedList2.remove(50), true);
 assert.equal(linkedList2.get(linkedList2.length - 1), aux);
 assert.equal(linkedList2.length, 2);
+
+// remove inexistent item
+assert.equal(linkedList2.remove(50), false);
