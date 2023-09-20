@@ -16,11 +16,9 @@ class LinkedList:
     _size: int = 0
 
     def _get_node(self, index: int):
-        _index = index
-        if index < 0:
-            _index = self._size + index
-            if _index < 0:
-                raise IndexError()
+        _index = self._size + index if index < 0 else index
+        if _index < 0:
+            raise IndexError()
         node = self._initial
         for _ in range(_index):
             if node is None:
@@ -64,7 +62,9 @@ class LinkedList:
         if self._size == 0:
             return ValueError()
         if self._initial.value == value:
-            self._initial = self._initial.next
+            aux = self._initial.next
+            self._initial.next = None
+            self._initial = aux
             self._size -= 1
             return True
         else:
